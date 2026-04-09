@@ -1,2 +1,29 @@
-.preserve-3d { transform-style: preserve-3d; }
-.backface-hidden { backface-visibility: hidden; })
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* O Fundo Escuro Global do App */
+body {
+    @apply bg-slate-900 text-slate-100 min-h-screen overflow-x-hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar Customizada (Visual Liquid Glass) */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.5); /* Indigo 500 com opacidade */
+    border-radius: 10px;
+}
+
+/* Utilitários 3D para a Carta de Sorte */
+.preserve-3d {
+    transform-style: preserve-3d;
+}
+.backface-hidden {
+    backface-visibility: hidden;
+}

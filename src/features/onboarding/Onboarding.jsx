@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUserStore } from '../../store/useUserStore';
 
 // Mock das configurações que depois irão para o Zustand/Firebase
 const MODUS_OPERANDI = [
@@ -19,6 +20,7 @@ const PALETTES = [
 ];
 
 export default function Onboarding() {
+    const completeOnboarding = useUserStore((state) => state.completeOnboarding);
     const [step, setStep] = useState(0);
     const [userData, setUserData] = useState({
         name: '',
