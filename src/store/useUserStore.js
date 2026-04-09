@@ -25,6 +25,12 @@ export const useUserStore = create((set) => ({
         freezeActive: false, // "Congelamento" ativo para os hábitos
         dayOffActive: false, // "Dia de Folga" ativo
     },
+    moodHistory: {}, // Estrutura: { "2026-04-08": "radiante" }
+    stats: {
+        tasksCompleted: 0,
+        maxStreak: 0,
+        sprintsWon: 0,
+    },
 
     // Ações
     completeOnboarding: (userData) => set((state) => ({
@@ -55,4 +61,7 @@ export const useUserStore = create((set) => ({
             activeBoosts: newBoosts
         };
     }),
+    setDailyMood: (dateStr, mood) => set((state) => ({
+        moodHistory: { ...state.moodHistory, [dateStr]: mood }
+    })),
 }));
