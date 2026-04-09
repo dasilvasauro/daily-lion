@@ -1,83 +1,87 @@
 import React, { useState } from 'react';
 import { useUserStore } from '../../store/useUserStore';
-import GlassCard from '../ui/GlassCard';
 
-// Ícones temporários (depois usaremos algo como lucide-react ou heroicons)
-const NavItem = ({ label, icon, active, onClick }) => (
-    <button
-    onClick={onClick}
-    className={`flex items-center gap-3 w-full p-3 rounded-xl transition-all ${
-        active ? 'bg-white/10 text-white font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'
-    }`}
-    >
-    <span className="text-xl">{icon}</span>
-    <span className="hidden md:inline">{label}</span>
-    </button>
-);
+// Vamos importar as telas que construímos!
+// Certifique-se de que os caminhos e arquivos existem na sua pasta src/features/
+import ProfileView from '../../features/profile/ProfileView';
+import StoreView from '../../features/store/StoreView';
+// Importe suas outras telas aqui quando as tiver prontas:
+import TaskView from '../../features/tasks/TaskView';
+// import HabitsView from '../../features/habits/HabitsView';
 
-export default function MainLayout({ children }) {
-    const { rpg, profile } = useUserStore();
-    const [currentTab, setCurrentTab] = useState('tarefas');
+export default function MainLayout() {
+    const { rpg } = useUserStore();
+    const [activeTab, setActiveTab] = useState('tarefas');
+
+    // Controle de Abas
+    const renderActiveView = () => {
+        switch (activeTab) {
+            case 'perfil':
+                return <ProfileView />;
+            case 'loja':
+                return <StoreView />;
+            case 'tarefas':
+                return <div className="text-center mt-20 text-slate-400">A Tela de Tarefas vai aqui</div>; // Substitua por <TaskView />
+            case 'habitos':
+                return <div className="text-center mt-20 text-slate-400">A Tela de Hábitos vai aqui</div>; // Substitua por <HabitsView />
+            default:
+                return null;
+        }
+    };
 
     return (
-        <div className="flex flex-col md:flex-row min-h-screen bg-slate-900 text-slate-100 font-sans overflow-hidden relative">
+        <div className="h-screen flex flex-col relative pb-20">
 
-        {/* Background Animado Global (respeitando configurações) */}
-        {profile.glassEnabled && (
-            <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
-            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] animate-blob"></div>
-            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] animate-blob animation-delay-2000"></div>
-            </div>
-        )}
-
-        {/* Barra de Navegação Lateral (Desktop) / Inferior (Mobile) */}
-        <GlassCard className="z-20 m-4 p-4 flex flex-row md:flex-col justify-between md:justify-start md:w-64 gap-2 border-white/10 fixed bottom-0 md:relative w-[calc(100%-2rem)] md:h-[calc(100vh-2rem)]">
-        <div className="hidden md:flex items-center gap-3 p-2 mb-8">
-        <img src="/assets/ios-lion.png" alt="Logo" className="w-10 h-10 drop-shadow-md" />
-        <h2 className="text-xl font-bold tracking-tight">Daily Lion</h2>
-        </div>
-
-        <nav className="flex md:flex-col flex-1 justify-around md:justify-start w-full gap-2">
-        <NavItem active={currentTab === 'tarefas'} onClick={() => setCurrentTab('tarefas')} icon="📝" label="Tarefas" />
-        <NavItem active={currentTab === 'habitos'} onClick={() => setCurrentTab('habitos')} icon="🔁" label="Hábitos" />
-        <NavItem active={currentTab === 'loja'} onClick={() => setCurrentTab('loja')} icon="🏪" label="Loja" />
-        <NavItem active={currentTab === 'perfil'} onClick={() => setCurrentTab('perfil')} icon="🦁" label="Perfil" />
-        </nav>
-        </GlassCard>
-
-        {/* Área Principal */}
-        <main className="flex-1 flex flex-col z-10 p-4 pb-24 md:pb-4 md:pl-0 h-screen overflow-hidden">
-
-        {/* Topbar: Status de RPG e Mood */}
-        <GlassCard className="w-full flex items-center justify-between p-4 mb-4 border-white/10">
-        <div className="flex items-center gap-6">
-        <div className="flex flex-col">
-        <span className="text-xs text-slate-400 uppercase tracking-wider font-bold">Nível {rpg.level}</span>
-        <div className="w-32 h-2 bg-slate-700 rounded-full mt-1 overflow-hidden">
-        <div className="h-full bg-blue-500 w-1/3" /> {/* Barra de XP mockada */}
-        </div>
-        </div>
-        </div>
-
-        <div className="flex items-center gap-4 font-medium">
-        <span className="flex items-center gap-1 text-amber-400">
-        🪙 {rpg.gold}
+        {/* TopBar (HUD do Jogador) */}
+        <header className="fixed top-0 w-full z-50 p-4 pointer-events-none">
+        <div className="max-w-4xl mx-auto flex justify-between items-center bg-slate-900/50 backdrop-blur-md border border-white/10 rounded-2xl p-3 pointer-events-auto shadow-lg">
+        <div className="flex items-center gap-3">
+        <span className="font-black text-slate-200 tracking-widest text-sm uppercase">
+        Nível {rpg.level}
         </span>
-        <span className="flex items-center gap-1 text-emerald-400">
-        🎟️ {rpg.vouchers}
-        </span>
+        <div className="w-24 h-2 bg-black/50 rounded-full overflow-hidden">
+        {/* Barra de XP falsa para visualização inicial */}
+        <div className="h-full bg-indigo-500 w-1/3" />
         </div>
-        </GlassCard>
+        </div>
+        <div className="flex items-center gap-4 font-bold text-sm">
+        <span className="text-amber-400 flex items-center gap-1">🪙 {rpg.gold}</span>
+        <span className="text-emerald-400 flex items-center gap-1">🎟️ {rpg.vouchers}</span>
+        </div>
+        </div>
+        </header>
 
-        {/* Conteúdo da Aba Atual (Scrollável) */}
-        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-        {/* Aqui renderizaremos as views de Tarefas, Hábitos, etc, baseado no currentTab */}
-        <div className="p-8 text-center text-slate-400">
-        Visão ativa: <span className="font-bold text-white capitalize">{currentTab}</span>
-        </div>
-        </div>
-
+        {/* Área de Conteúdo Principal (Scrollável) */}
+        <main className="flex-1 overflow-y-auto pt-24 px-4 custom-scrollbar">
+        {renderActiveView()}
         </main>
+
+        {/* Botão Flutuante (FAB) - Onde o Leão ruge! */}
+        <button
+        onClick={() => console.log('Abrir Modal de Nova Tarefa')}
+        className="fixed bottom-24 right-6 w-16 h-16 bg-indigo-600 hover:bg-indigo-500 rounded-2xl flex items-center justify-center text-3xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition-all hover:scale-105 active:scale-95 z-50 border border-white/20"
+        >
+        ➕
+        </button>
+
+        {/* Bottom Navigation */}
+        <nav className="fixed bottom-4 w-full px-4 z-50">
+        <div className="max-w-md mx-auto bg-slate-800/80 backdrop-blur-xl border border-white/10 rounded-2xl flex justify-around items-center p-2 shadow-2xl">
+        <button onClick={() => setActiveTab('tarefas')} className={`p-3 rounded-xl transition-all ${activeTab === 'tarefas' ? 'bg-white/10 scale-110' : 'opacity-50 hover:opacity-100'}`}>
+        📝
+        </button>
+        <button onClick={() => setActiveTab('habitos')} className={`p-3 rounded-xl transition-all ${activeTab === 'habitos' ? 'bg-white/10 scale-110' : 'opacity-50 hover:opacity-100'}`}>
+        🔁
+        </button>
+        <button onClick={() => setActiveTab('loja')} className={`p-3 rounded-xl transition-all ${activeTab === 'loja' ? 'bg-white/10 scale-110' : 'opacity-50 hover:opacity-100'}`}>
+        🏪
+        </button>
+        <button onClick={() => setActiveTab('perfil')} className={`p-3 rounded-xl transition-all ${activeTab === 'perfil' ? 'bg-white/10 scale-110' : 'opacity-50 hover:opacity-100'}`}>
+        🦁
+        </button>
+        </div>
+        </nav>
+
         </div>
     );
 }
