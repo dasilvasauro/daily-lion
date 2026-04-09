@@ -26,6 +26,7 @@ export const useTaskStore = create((set, get) => ({
         };
 
         set({ tasks: [...tasks, newTask] });
+        return newTask;
     },
 
     // 2. Marcar tarefa comum como concluída

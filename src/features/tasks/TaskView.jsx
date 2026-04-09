@@ -68,9 +68,9 @@ export default function TaskView() {
         {/* Botão Flutuante (FAB) */}
         <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-24 right-6 md:bottom-10 md:right-10 w-16 h-16 bg-amber-600 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:bg-amber-500 hover:scale-110 transition-all active:scale-95 z-50"
+        className="fixed bottom-24 right-6 md:bottom-24 md:right-10 w-16 h-16 bg-accent rounded-2xl flex items-center justify-center text-3xl shadow-[0_0_20px_var(--accent-color)] hover:scale-105 transition-all active:scale-95 z-50 text-white border border-white/20"
         >
-        +
+        ➕
         </button>
 
         <CreateTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

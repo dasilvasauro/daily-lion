@@ -4,11 +4,12 @@ export default {
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
     ],
-    darkMode: 'class', // Permite alternar tema claro/escuro facilmente
+    darkMode: 'class',
     theme: {
         extend: {
             colors: {
-                // Nossas 6 cores "Accent"
+                // Adicionamos a cor 'accent' que lerá nossa variável CSS
+                accent: 'var(--accent-color, #4682B4)',
                 lion: {
                     steel: '#4682B4',
                     emerald: '#50C878',
