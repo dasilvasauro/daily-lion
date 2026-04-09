@@ -32,6 +32,37 @@ export const useUserStore = create((set) => ({
         sprintsWon: 0,
     },
 
+    // Lógica simples de curva de XP (ex: Nível 1 precisa de 1000, Nível 2 de 1500, etc.)
+    const calculateMaxXP = (level) => 1000 + (level * 500);
+
+    // Adicione isso ao estado inicial:
+    pendingLevelUp: false,
+
+    // Atualize a ação addXP:
+    addXP: (amount) => set((state) => {
+        let newXP = state.rpg.xp + amount;
+        let newLevel = state.rpg.level;
+        let isLevelUp = false;
+
+        let maxXP = calculateMaxXP(newLevel);
+
+        // Verifica se "upou" (suporta múltiplos level ups de uma vez se ganhar muito XP)
+        while (newXP >= maxXP) {
+            newXP -= maxXP;
+            newLevel += 1;
+            isLevelUp = true;
+            maxXP = calculateMaxXP(newLevel);
+        }
+
+        return {
+            rpg: { ...state.rpg, xp: newXP, level: newLevel },
+            pendingLevelUp: state.pendingLevelUp || isLevelUp // Aciona o gatilho da carta
+        };
+    }),
+
+    // Ação para consumir o gatilho após revelar a carta
+    consumeLevelUp: () => set({ pendingLevelUp: false }),
+
     // Ações
     completeOnboarding: (userData) => set((state) => ({
         isNewUser: false,
