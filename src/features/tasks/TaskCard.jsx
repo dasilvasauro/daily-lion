@@ -7,6 +7,8 @@ export default function TaskCard({ task, onComplete }) {
     const [isExpanded, setIsExpanded] = useState(false);
     const hasSubtasks = task.subtasks && task.subtasks.length > 0;
     const isSprint = task.type === 'sprint';
+    const { timeLeft, isActive } = useFocusTimer(task);
+    const [showFocus, setShowFocus] = useState(false);
 
     const priorityColors = {
         P0: 'border-l-red-500',
@@ -14,6 +16,14 @@ export default function TaskCard({ task, onComplete }) {
         P2: 'border-l-blue-500',
         P3: 'border-l-slate-500',
         P4: 'border-l-emerald-500',
+    };
+
+    const handleStartTimer = async () => {
+        const startTime = new Date().toISOString();
+        // Atualiza na store e no banco
+        updateTask(task.id, { timerStartedAt: startTime });
+        await db.tasks.update(task.id, { timerStartedAt: startTime });
+        setShowFocus(true);
     };
 
     return (
@@ -70,6 +80,33 @@ export default function TaskCard({ task, onComplete }) {
             </div>
             </div>
         )}
+
+        {/* No corpo do card, se for tipo 'time' */}
+        {task.type === 'time' && (
+            <div className="flex items-center gap-3 mt-2">
+            <button
+            onClick={handleStartTimer}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                isActive ? 'bg-amber-600' : 'bg-emerald-600'
+            }`}
+            >
+            {isActive ? 'CONTINUAR FOCO' : '▶ INICIAR (2h)'}
+            </button>
+            {isActive && <span className="text-xs font-mono">{Math.floor(timeLeft/60)}m restantes</span>}
+            </div>
+        )}
+
+        {/* Overlay de Foco Fullscreen */}
+        <AnimatePresence>
+        {showFocus && (
+            <FocusOverlay
+                task={task}
+                timeLeft={timeLeft}
+                onClose={() => setShowFocus(false)}
+            />
+        )}
+        </AnimatePresence>
+
         </GlassCard>
         </motion.div>
     );
