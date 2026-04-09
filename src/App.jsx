@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { runFullSync } from './services/sync';
 
+<LuckCardReveal />
+
 // Dentro do seu App.jsx
 useEffect(() => {
     // Sincroniza ao abrir o app

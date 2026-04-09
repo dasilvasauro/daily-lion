@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { useUserStore } from './useUserStore';
 import { TASK_LIMITS, EDIT_FREE_WINDOW_MINUTES, VOUCHER_COST_EDIT, VOUCHER_COST_DELETE } from '../utils/constants';
+import { getSprintTier } from '.../utis/constants';
 
 export const useTaskStore = create((set, get) => ({
     tasks: [],
@@ -20,13 +21,19 @@ export const useTaskStore = create((set, get) => ({
         if (taskData.priority === 'P1' && activeP1 >= TASK_LIMITS.P1) {
             throw new Error("Limite de tarefas P1 atingido!");
         }
+        if (taskData.type === 'sprint') {
+            const hasActiveSprint = tasks.some(t => t.type === 'sprint' && !t.completed);
+            if (hasActiveSprint) {
+                throw new Error("Você já possui uma Sprint em andamento. Foco! Termine uma corrida antes de começar outra.");
+            }
+        }
 
         const newTask = {
             id: crypto.randomUUID(),
-                                                  createdAt: new Date().toISOString(),
-                                                  completed: false,
-                                                  subtasks: [],
-                                                  ...taskData,
+            createdAt: new Date().toISOString(),
+            completed: false,
+            subtasks: [],
+            ...taskData,
         };
 
         set({ tasks: [...tasks, newTask] });
@@ -75,4 +82,40 @@ export const useTaskStore = create((set, get) => ({
             tasks: state.tasks.filter(t => t.id !== taskId)
         }));
     }
+
+    toggleSprintSubtask: (sprintId, subtaskId) => {
+        const { tasks } = get();
+        const { addXP, addGold } = useUserStore.getState(); // Para pagar o prêmio no final
+
+        const sprint = tasks.find(t => t.id === sprintId);
+        if (!sprint || sprint.type !== 'sprint') return;
+
+        // Atualiza a subtarefa específica
+        const updatedSubtasks = sprint.subtasks.map(sub =>
+        sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
+        );
+
+        const isFullyCompleted = updatedSubtasks.every(sub => sub.completed);
+
+        // Se terminou a Sprint toda, paga o prêmio massivo!
+        if (isFullyCompleted && !sprint.completed) {
+            const tier = getSprintTier(updatedSubtasks.length);
+            addXP(tier.xp);
+            addGold(tier.gold);
+
+            // Opcional: Aqui você pode disparar um set para adicionar a medalha no Perfil do usuário!
+            useUserStore.setState(state => ({ profile: { ...state.profile, medals: [...state.profile.medals, tier.label] } }));
+        }
+
+        // Atualiza a Store e o Banco Offline
+        const updatedSprint = {
+            ...sprint,
+            subtasks: updatedSubtasks,
+            completed: isFullyCompleted
+        };
+
+        set({ tasks: tasks.map(t => t.id === sprintId ? updatedSprint : t) });
+
+        // Importe o db do Dexie para salvar offline (db.tasks.update(sprintId, updatedSprint))
+    },
 }));
